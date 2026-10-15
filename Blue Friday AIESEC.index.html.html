@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blue Friday AIESEC | Sua próxima experiência começa aqui!</title>
+<style>
+:root{--bg:#eaf3ff;--card:#fff;--ink:#0b2545;--muted:#4a6285;--blue:#037ef3;--blue2:#0a3d91;--line:#c9dcf5;--ok:#0a7d4f;--err:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#071a33;--card:#0e2747;--ink:#eaf3ff;--muted:#9db6d8;--line:#25456f;--ok:#4ade9a;--err:#ff8a80}}
+:root[data-theme="dark"]{--bg:#071a33;--card:#0e2747;--ink:#eaf3ff;--muted:#9db6d8;--line:#25456f;--ok:#4ade9a;--err:#ff8a80}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+.hero{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;text-align:center;padding:56px 20px 88px}
+.badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;font-size:.85rem;font-weight:600;margin-bottom:16px}
+h1{margin:0 0 14px;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15}
+.hero p{max-width:640px;margin:0 auto;font-size:1.05rem;opacity:.95}
+main{max-width:520px;margin:-56px auto 40px;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px 24px;box-shadow:0 10px 30px rgba(3,126,243,.15)}
+.card h2{margin:0 0 4px;font-size:1.25rem}
+.sub{margin:0 0 20px;color:var(--muted);font-size:.95rem}
+label{display:block;font-weight:600;font-size:.9rem;margin:14px 0 6px}
+input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:transparent;color:var(--ink)}
+input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(3,126,243,.2)}
+button{width:100%;margin-top:22px;padding:15px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.msg{margin-top:14px;font-size:.95rem;text-align:center}
+.msg.ok{color:var(--ok);font-weight:600}.msg.err{color:var(--err)}
+.thanks{text-align:center;padding:10px 0}
+.thanks .big{font-size:2.6rem}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:0 16px 32px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <span class="badge">💙 Blue Friday AIESEC</span>
+  <h1>Sua próxima experiência começa aqui!</h1>
+  <p>Está na hora de tirar seus planos do papel! 🌎✨ A Blue Friday chegou com condições especiais para você viver uma experiência internacional, conhecer novas culturas e gerar impacto positivo no mundo. Preencha o formulário e descubra as oportunidades disponíveis para dar o próximo passo rumo ao seu intercâmbio!</p>
+</header>
+<main>
+  <div class="card" id="card">
+    <h2>Quero saber mais</h2>
+    <p class="sub">Preencha seus dados e entraremos em contato.</p>
+    <div id="formWrap">
+      <label for="nome">Nome</label>
+      <input id="nome" type="text" autocomplete="name" placeholder="Seu nome completo">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" placeholder="voce@email.com">
+      <label for="idade">Idade</label>
+      <input id="idade" type="number" inputmode="numeric" min="10" max="99" placeholder="Ex.: 21">
+      <label for="telefone">Telefone</label>
+      <input id="telefone" type="tel" autocomplete="tel" placeholder="(48) 99999-9999">
+      <button id="enviar" type="button">Enviar 💙</button>
+      <div id="msg" class="msg" role="status"></div>
+    </div>
+  </div>
+</main>
+<footer>AIESEC · Blue Friday</footer>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var db=null;
+  try{
+    if(window.claude&&claude.use){claude.use("db").then(function(d){db=d}).catch(function(){})}
+  }catch(e){}
+  function show(t,c){var m=$("msg");m.textContent=t;m.className="msg "+(c||"")}
+  $("enviar").addEventListener("click",async function(){
+    var nome=$("nome").value.trim(),email=$("email").value.trim(),idade=$("idade").value.trim(),tel=$("telefone").value.trim();
+    if(!nome||!email||!idade||!tel){show("Preencha todos os campos.","err");return}
+    if(!/^\S+@\S+\.\S+$/.test(email)){show("Digite um email válido.","err");return}
+    if(tel.replace(/\D/g,"").length<10){show("Digite um telefone válido com DDD.","err");return}
+    if(!db){show("Não foi possível enviar agora. Tente novamente em instantes.","err");return}
+    var btn=this;btn.disabled=true;show("Enviando...");
+    try{
+      var id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+      await db.collection("inscricoes").doc(id).set({nome:nome,email:email,idade:Number(idade),telefone:tel,enviadoEm:new Date().toISOString()});
+      $("formWrap").innerHTML='<div class="thanks"><div class="big">🎉</div><h2>Recebemos seus dados!</h2><p class="sub">Em breve nossa equipe entra em contato com as oportunidades da Blue Friday.</p></div>';
+    }catch(e){btn.disabled=false;show("Algo deu errado. Tente novamente.","err")}
+  });
+})();
+</script>
+</body>
+</html>
